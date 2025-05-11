@@ -78,6 +78,12 @@ class NoblemtlParser extends Parser {
         return dom.querySelector(".entry-content");
     }
 
+    customRawDomToContentStep(chapter, content) {
+        content.querySelectorAll("*").forEach(element => {
+            util.replaceSemanticInlineStylesWithTags(element, true);
+        });
+    }
+
     extractTitleImpl(dom) {
         return dom.querySelector("h1.entry-title");
     }
@@ -87,9 +93,10 @@ class NoblemtlParser extends Parser {
             .filter(p => p.style.opacity === "0");
         util.removeElements(toRemove);
         util.removeElements(this.findEmptySpanElements(element));
-        util.removeChildElementsMatchingSelector(element, "span.modern-footnotes-footnote__note");
-        util.removeChildElementsMatchingSelector(element, "span.footnote_tooltip");
-        util.removeChildElementsMatchingSelector(element, "div#hpk");
+        util.removeChildElementsMatchingSelector(element,
+            "span.modern-footnotes-footnote__note, span.footnote_tooltip, " +
+            "span.footnote_tooltip, div#hpk, .uwp_widget_author_box");
+
         super.removeUnwantedElementsFromContentElement(element);
     }
 
