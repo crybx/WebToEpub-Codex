@@ -2,15 +2,10 @@
 
 //dead url/ parser
 parserFactory.register("comrademao.com", () => new ComrademaoParser());
-HttpClient.blockedSites.add("comrademao.com");
 
 class ComrademaoParser extends Parser {
     constructor() {
         super();
-    }
-
-    disabled() {
-        return UIText.Warning.parserDisabledNotification;
     }
 
     populateUIImpl() {

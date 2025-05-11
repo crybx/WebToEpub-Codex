@@ -1,7 +1,6 @@
 "use strict";
 
 parserFactory.register("noveldex.io", () => new NoveldexParser());
-HttpClient.blockedSites.add("noveldex.io");
 
 /**
  * Parser for the http://noveldex.io/ site.
@@ -9,10 +8,6 @@ HttpClient.blockedSites.add("noveldex.io");
 class NoveldexParser extends Parser { // eslint-disable-line no-unused-vars
     constructor() {
         super();
-    }
-
-    disabled() {
-        return UIText.Warning.parserDisabledNotification;
     }
 
     /*

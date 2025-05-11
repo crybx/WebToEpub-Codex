@@ -1,15 +1,10 @@
 "use strict";
 
 parserFactory.register("mtlnation.com", () => new MtlnationParser());
-HttpClient.blockedSites.add("mtlnation.com");
 
 class MtlnationParser extends MadaraParser {
     constructor() {
         super();
-    }
-
-    disabled() {
-        return UIText.Warning.parserDisabledNotification;
     }
 
     findContent(dom) {
