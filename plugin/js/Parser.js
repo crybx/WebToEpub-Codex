@@ -665,7 +665,7 @@ class Parser {
             return false;
         }
         return !href.startsWith("#") &&
-            !href.startsWith("../Text/");
+            !href.startsWith("../text/");
     }
 
     hyperlinkToEpubItemUrl(link, targets) {
