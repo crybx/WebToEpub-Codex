@@ -55,7 +55,7 @@ class ReadingList {
                 }
             }
             if (!foundLastURL) {
-                let SourceChapterList = await Library.LibGetSourceChapterList(url);
+                let SourceChapterList = await LibraryStorage.LibGetSourceChapterList(url);
                 if (SourceChapterList == null) {
                     return;
                 }

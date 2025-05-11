@@ -29,19 +29,23 @@ class Download {
 
     static CustomFilename() {
         let CustomFilename = document.getElementById("CustomFilenameInput").value;
+        let metaInfo = main.metaInfoFromControls();
         let ToReplace = {
-            "%URL_hostname%": (new URL(document.getElementById("startingUrlInput").value))?.hostname,
-            "%Title%": document.getElementById("titleInput").value,
-            "%Author%": document.getElementById("authorInput").value,
-            "%Language%": document.getElementById("languageInput").value,
+            "%URL_hostname%": (new URL(metaInfo.uuid))?.hostname,
+            "%Title%": metaInfo.title,
+            "%Author%": metaInfo.author,
+            "%Language%": metaInfo.language,
             "%Chapters_Count%":  document.getElementById("spanChapterCount").innerHTML,
             "%Chapters_Downloaded%":  document.getElementById("fetchProgress").value-1,
-            "%Filename%": document.getElementById("fileNameInput").value,
+            "%Filename%": metaInfo.fileName,
         };
         for (const [key, value] of Object.entries(ToReplace)) {
             CustomFilename = CustomFilename.replaceAll(key, value);
         }
         CustomFilename = CustomFilename.trim();
+        if (CustomFilename == "") {
+            return EpubPacker.addExtensionIfMissing(metaInfo.fileName);
+        }
         if (Download.isFileNameIllegalOnWindows(CustomFilename)) {
             ErrorLog.showErrorMessage(UIText.Error.errorIllegalFileName(CustomFilename, Download.illegalWindowsFileNameChars));
 
@@ -82,7 +86,7 @@ class Download {
             }
             else {
                 fileName = EpubPacker.addExtensionIfMissing("IllegalFileName");
-            }            
+            }
         }
         let options = {
             url: URL.createObjectURL(blob),

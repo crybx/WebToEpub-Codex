@@ -67,7 +67,7 @@ class DefaultParserSiteSettings {
                 try {
                     return dom.querySelector(config.contentCss);
                 } catch (e) {
-                    return null; 
+                    return null;
                 }
             };
             if (!util.isNullOrEmpty(config.titleCss))
@@ -161,7 +161,7 @@ class DefaultParserUI {
 
     static bindSmartScanner() {
         const testUrlInput = DefaultParserUI.getTestChapterUrlInput();
-        
+
         if (!testUrlInput) return;
         if (testUrlInput.dataset.smartBound === "true") return;
         testUrlInput.dataset.smartBound = "true";
@@ -171,7 +171,7 @@ class DefaultParserUI {
         testUrlInput.addEventListener("input", () => {
             clearTimeout(debounceTimer);
             let url = testUrlInput.value.trim();
-            
+
             if (!url) {
                 const statusSpan = document.getElementById("smartDetectStatus");
                 if (statusSpan) statusSpan.textContent = "";
@@ -201,7 +201,7 @@ class DefaultParserUI {
         try {
             // Pass the preloaded DOM directly to the scanner
             let result = await HeuristicScanner.scan(url, preloadedDom);
-            
+
             if (result.status === "success") {
                 DefaultParserUI.getContentCssInput().value = result.contentCss;
                 DefaultParserUI.getChapterTitleCssInput().value = result.titleCss;
@@ -221,13 +221,15 @@ class DefaultParserUI {
     }
 
     static setDefaultParserUiVisibility(isVisible) {
-        ChapterUrlsUI.setVisibleUI(!isVisible);
         if (isVisible) {
-            ChapterUrlsUI.getEditChaptersUrlsInput().hidden = true;
-            ChapterUrlsUI.modifyApplyChangesButtons(button => button.hidden = true);
-            document.getElementById("editURLsHint").hidden = true;
+            DefaultParserUI.restoreSections = main.hideAllSectionsExcept("defaultParserSection");
+        } else {
+            // Restore previous section visibility state
+            if (DefaultParserUI.restoreSections) {
+                DefaultParserUI.restoreSections();
+                DefaultParserUI.restoreSections = null;
+            }
         }
-        document.getElementById("defaultParserSection").hidden = !isVisible;
     }
 
     static async testDefaultParser(parser) {

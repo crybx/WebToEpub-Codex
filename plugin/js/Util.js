@@ -8,7 +8,7 @@
 "use strict";
 
 const util = (function() {
-    var sleepController = new AbortController;
+    let sleepController = new AbortController;
 
     function sleep(ms) {
         return new Promise(resolve => {
@@ -76,7 +76,7 @@ const util = (function() {
     function populateHead(doc, head) {
         let style = doc.createElementNS(XMLNS, "link");
         head.appendChild(style);
-        style.setAttribute("href", makeRelative(styleSheetFileName()));
+        style.setAttribute("href", makeRelative(EpubStructure.get().stylesheet));
         style.setAttribute("type", "text/css");
         style.setAttribute("rel", "stylesheet");
     }
@@ -124,9 +124,11 @@ const util = (function() {
         return (content && content.startsWith("data:")) ? "" : content;
     }
 
-    // assumes we're making link from file in OEBPS\Text to OEBPS\Images
+    // assumes we're making link from file in text directory to images/styles
     function makeRelative(href) {
-        return ".." + href.substring(5);
+        let paths = EpubStructure.get();
+        let contentDirLength = paths.contentDir.length;
+        return ".." + href.substring(contentDirLength);
     }
 
     function resolveRelativeUrl(baseUrl, relativeUrl) {
@@ -172,6 +174,9 @@ const util = (function() {
 
     // refer https://usamaejaz.com/cloudflare-email-decoding/
     function decodeCloudflareProtectedEmails(content) {
+        if (!content) {
+            return;
+        }
         for (let link of [...content.querySelectorAll(".__cf_email__")]) {
             replaceCloudflareProtectedLink(link);
         }
@@ -209,7 +214,21 @@ const util = (function() {
 
     // delete all nodes in the supplied array
     function removeElements(elements) {
-        for (let e of elements) {
+        // Handle if elements is not an array or NodeList
+        if (!elements) {
+            return; // Handle null/undefined case
+        }
+
+        // If it's a single element (not iterable)
+        if (elements.nodeType || !elements[Symbol.iterator]) {
+            elements.remove();
+            return;
+        }
+
+        // Snapshot before removing. Live collections (element.children,
+        // getElementsBy*) re-index as elements are removed, so iterating them
+        // directly skips every other element.
+        for (let e of [...elements]) {
             e.remove();
         }
     }
@@ -874,10 +893,6 @@ const util = (function() {
         return dom;
     }
 
-    function styleSheetFileName() {
-        return "OEBPS/Styles/stylesheet.css";
-    }
-
     function extractUrlFromBackgroundImage(element) {
         const background = element?.style?.backgroundImage;
         return background?.substring(5, background.length - 2) ?? null;
@@ -1074,6 +1089,7 @@ const util = (function() {
         if (retval) retval = retval[0];
         return retval;
     }
+
     function detectMimeType(b64) {
         let b64b = atob(b64);
         for (var s in MIME_TYPE_SIGNATURES) {
@@ -1168,11 +1184,141 @@ const util = (function() {
         "WaZqlQ==": ["image/x-cmu-raster"]
     };
 
+    function removeTagsFromContent(content, tagNames) {
+        // Convert single tagName to array for consistent handling
+        const tagNamesArray = Array.isArray(tagNames) ? tagNames : [tagNames];
+
+        for (let tagName of tagNamesArray) {
+            let elements = content?.querySelectorAll(tagName);
+            if (elements?.length > 0) {
+                removeElements(elements);
+            }
+        }
+    }
+
+    function removeElementWithClasses(element, classNames) {
+        // Convert single string to array for consistent handling
+        const classNamesArray = Array.isArray(classNames) ? classNames : [classNames];
+
+        for (let className of classNamesArray) {
+            if (element.classList.contains(className)) {
+                element.remove();
+                break; // Once element is removed, no need to check other classes
+            }
+        }
+    }
+
+    function removeElementWithClassesThatStartWith(element, prefixes) {
+        // Convert single string to array for consistent handling
+        const prefixArray = Array.isArray(prefixes) ? prefixes : [prefixes];
+
+        // Check if element has classes
+        if (element.classList && element.classList.length > 0) {
+            // Check each class against each prefix
+            for (let prefix of prefixArray) {
+                for (let className of element.classList) {
+                    if (className.startsWith(prefix)) {
+                        element.remove();
+                        return; // Once element is removed, no need to continue
+                    }
+                }
+            }
+        }
+    }
+
+    function removeElementWithAttributes(element, attributes) {
+        // Convert single attribute to array for consistent handling
+        const attributesArray = Array.isArray(attributes) ? attributes : [attributes];
+
+        for (let attribute of attributesArray) {
+            if (element.hasAttribute(attribute)) {
+                element.remove();
+                break; // Once element is removed, no need to check other attributes
+            }
+        }
+    }
+
+    function removeClasses(element, classes) {
+        element.classList.remove(...classes);
+        if (element.classList.length === 0) {
+            removeAttributes(element, "class");
+        }
+    }
+
+    function removeClassesThatStartWith(element, prefixes) {
+        // Convert single string to array for consistent handling
+        const prefixArray = Array.isArray(prefixes) ? prefixes : [prefixes];
+
+        // Get all classes
+        let classes = element.classList;
+        let classesToRemove = [];
+
+        // First collect all classes to remove
+        for (let c of classes) {
+            for (let prefix of prefixArray) {
+                if (c.startsWith(prefix)) {
+                    classesToRemove.push(c);
+                    break; // No need to check other prefixes for this class
+                }
+            }
+        }
+
+        // Then remove them
+        for (let classToRemove of classesToRemove) {
+            element.classList.remove(classToRemove);
+        }
+
+        // Remove the class attribute if no classes remain
+        if (element.classList.length === 0) {
+            removeAttributes(element, "class");
+        }
+    }
+
+    function removeAttributesThatStartWith(element, prefixes) {
+        // Convert single string to array for consistent handling
+        const prefixArray = Array.isArray(prefixes) ? prefixes : [prefixes];
+
+        // Get all attributes
+        const attributes = element.attributes;
+        const attributesToRemove = [];
+
+        // First collect all attributes to remove
+        for (let i = 0; i < attributes.length; i++) {
+            const attr = attributes[i];
+            for (let prefix of prefixArray) {
+                if (attr.name.startsWith(prefix)) {
+                    attributesToRemove.push(attr.name);
+                    break; // No need to check other prefixes for this attribute
+                }
+            }
+        }
+
+        // Then remove them
+        for (let attrName of attributesToRemove) {
+            element.removeAttribute(attrName);
+        }
+    }
+
+    function unwrapTag(element) {
+        while (element.firstChild) {
+            element.parentNode.insertBefore(element.firstChild, element);
+        }
+        element.parentNode.removeChild(element);
+    }
+
+    function unwrapAllOfTag(content, tagName) {
+        const elements = content?.querySelectorAll(tagName) || [];
+        for (const element of elements) {
+            unwrapTag(element);
+        }
+    }
+
     return {
         XMLNS: XMLNS,
         INLINE_ELEMENTS: INLINE_ELEMENTS,
         BLOCK_ELEMENTS: BLOCK_ELEMENTS,
         HEADER_TAGS: HEADER_TAGS,
+
         sleep: sleep,
         getSleepController: () => sleepController,
         resetSleepController: resetSleepController,
@@ -1250,7 +1396,6 @@ const util = (function() {
         getElements: getElements,
         moveIfParent: moveIfParent,
         safeForFileName: safeForFileName,
-        styleSheetFileName: styleSheetFileName,
         isStringWhiteSpace: isStringWhiteSpace,
         isElementWhiteSpace: isElementWhiteSpace,
         isHeaderTag: isHeaderTag,
@@ -1275,6 +1420,15 @@ const util = (function() {
         removeEmptyAttributes: removeEmptyAttributes,
         removeSpansWithNoAttributes: removeSpansWithNoAttributes,
         replaceSemanticInlineStylesWithTags: replaceSemanticInlineStylesWithTags,
+        removeTagsFromContent: removeTagsFromContent,
+        removeElementWithClasses: removeElementWithClasses,
+        removeElementWithClassesThatStartWith: removeElementWithClassesThatStartWith,
+        removeElementWithAttributes: removeElementWithAttributes,
+        removeClasses: removeClasses,
+        removeClassesThatStartWith: removeClassesThatStartWith,
+        removeAttributesThatStartWith: removeAttributesThatStartWith,
+        unwrapTag: unwrapTag,
+        unwrapAllOfTag: unwrapAllOfTag,
         wrapInnerContentInTag: wrapInnerContentInTag,
         getDefaultExtensionByMime: getDefaultExtensionByMime,
         detectMimeType: detectMimeType
