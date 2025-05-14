@@ -118,8 +118,7 @@ class EpubPacker {
             this.addMetaProperty(metadata, identifier, "identifier-type", "BookId", "URI");
             let meta = this.createAndAppendChildNS(metadata, opf_ns, "meta");
             meta.setAttributeNS(null, "property", "dcterms:modified");
-            let dateWithoutMillisecond = this.getDateForMetaData().substring(0, 19) + "Z";
-            meta.textContent = dateWithoutMillisecond;
+            meta.textContent = this.getDateForMetaData().substring(0, 19) + "Z"; // date without milliseconds
         }
 
         let webToEpubVersion = `[https://github.com/dteviot/WebToEpub] (ver. ${util.extensionVersion()})`;

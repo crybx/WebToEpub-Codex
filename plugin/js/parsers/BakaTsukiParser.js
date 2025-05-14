@@ -43,7 +43,7 @@ class BakaTsukiParser extends Parser {
     }
 
     static register() {
-        parserFactory.reregister("baka-tsuki.org", () => new BakaTsukiParser(new BakaTsukiImageCollector()));      
+        parserFactory.reregister("baka-tsuki.org", () => new BakaTsukiParser(new BakaTsukiImageCollector()));
     }
 
     rebuildImagesToFetch() {
