@@ -128,9 +128,9 @@ class Parser {
             let errorMsg = chrome.i18n.getMessage("warningNoVisibleContent", [webPage.sourceUrl]);
             ErrorLog.showErrorMessage(errorMsg);
         }
-
-        // Cache the processed content if caching is enabled
-        if (webPage.sourceUrl && ChapterCache.isEnabled()) {
+        
+        // Cache the processed content (uses persistent or session storage based on settings)
+        if (webPage.sourceUrl) {
             // Fire and forget - don't wait for cache write
             ChapterCache.set(webPage.sourceUrl, content).then(() => {
                 // Update UI to show cache icon
@@ -581,9 +581,9 @@ class Parser {
 
     async fetchWebPageContent(webPage) {
         let pageParser = webPage.parser;
-
-        // Check cache first if caching is enabled
-        if (ChapterCache.isEnabled()) {
+        
+        // Check cache first (checks persistent or session storage based on settings)
+        {
             try {
                 let cachedContent = await ChapterCache.get(webPage.sourceUrl);
                 if (cachedContent) {
