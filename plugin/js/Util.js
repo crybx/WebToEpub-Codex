@@ -8,8 +8,8 @@
 "use strict";
 
 const util = (function() {
-    var sleepController = new AbortController;
-    
+    let sleepController = new AbortController;
+
     function sleep(ms) {
         return new Promise(resolve => {
             function finished() {
