@@ -576,16 +576,16 @@ class Parser {
     }
 
     async fetchWebPageContent(webPage) {
-        ChapterUrlsUI.showDownloadState(webPage.row, ChapterUrlsUI.DOWNLOAD_STATE_SLEEPING);
-        await this.rateLimitDelay();
-        ChapterUrlsUI.showDownloadState(webPage.row, ChapterUrlsUI.DOWNLOAD_STATE_DOWNLOADING);
         let pageParser = webPage.parser;
 
-        // Check cache first if caching is enabled
-        if (that.enableChapterCaching) {
+        // Check cache first if caching is enabled - no delay needed for cached content
+        if (this.enableChapterCaching) {
             try {
                 let cachedContent = await ChapterCache.get(webPage.sourceUrl);
                 if (cachedContent) {
+                    // Skip the delay for cached content
+                    ChapterUrlsUI.showDownloadState(webPage.row, ChapterUrlsUI.DOWNLOAD_STATE_DOWNLOADING);
+
                     // Create a mock DOM with cached content
                     let cachedDom = Parser.makeEmptyDocForContent(webPage.sourceUrl);
                     cachedDom.content.parentNode.replaceChild(cachedContent, cachedDom.content);
@@ -601,6 +601,11 @@ class Parser {
                 // Continue with normal fetch if cache read fails
             }
         }
+        
+        // Only apply rate limit delay for actual web fetches
+        ChapterUrlsUI.showDownloadState(webPage.row, ChapterUrlsUI.DOWNLOAD_STATE_SLEEPING);
+        await this.rateLimitDelay();
+        ChapterUrlsUI.showDownloadState(webPage.row, ChapterUrlsUI.DOWNLOAD_STATE_DOWNLOADING);
 
         return pageParser.fetchChapter(webPage.sourceUrl).then((webPageDom) => {
             delete webPage.error;
