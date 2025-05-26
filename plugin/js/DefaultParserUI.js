@@ -136,10 +136,10 @@ class DefaultParserUI { // eslint-disable-line no-unused-vars
 
     static setDefaultParserUiVisibility(isVisible) {
         // toggle mode
-        ChaptersUI.setVisibleUI(!isVisible);
+        ChapterUrlsUI.setVisibleUI(!isVisible);
         if (isVisible) {
-            ChaptersUI.getEditChaptersUrlsInput().hidden = true;
-            ChaptersUI.modifyApplyChangesButtons(button => button.hidden = true);
+            ChapterUrlsUI.getEditChaptersUrlsInput().hidden = true;
+            ChapterUrlsUI.modifyApplyChangesButtons(button => button.hidden = true);
             document.getElementById("editURLsHint").hidden = true;
         }
         document.getElementById("defaultParserSection").hidden = !isVisible;
