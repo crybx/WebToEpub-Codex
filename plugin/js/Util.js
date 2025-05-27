@@ -142,6 +142,9 @@ const util = (function() {
 
     // refer https://usamaejaz.com/cloudflare-email-decoding/
     function decodeCloudflareProtectedEmails(content) {
+        if (!content) {
+            return;
+        }
         for (let link of [...content.querySelectorAll(".__cf_email__")]) {
             replaceCloudflareProtectedLink(link);
         }
