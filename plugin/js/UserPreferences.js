@@ -97,6 +97,7 @@ class UserPreferences { // eslint-disable-line no-unused-vars
         this.noDownloadPopup = this.addPreference("noDownloadPopup", "noDownloadPopupCheckbox", false);
         this.writeErrorHistoryToFile = this.addPreference("writeErrorHistoryToFile", "writeErrorHistoryToFileCheckbox", false);
         this.createEpub3 = this.addPreference("createEpub3", "createEpub3Checkbox", false);
+        this.epubInternalStructure = this.addPreference("epubInternalStructure", "epubInternalStructureSelect", "OEBPS");
         this.chaptersPageInChapterList = this.addPreference("chaptersPageInChapterList", "chaptersPageInChapterListCheckbox", false);
         this.autoSelectBTSeriesPage = this.addPreference("autoSelectBTSeriesPage", "autoParserSelectIncludesBTSeriesPageCheckbox", false);
         this.removeAuthorNotes = this.addPreference("removeAuthorNotes", "removeAuthorNotesCheckbox", false);
@@ -282,5 +283,19 @@ class UserPreferences { // eslint-disable-line no-unused-vars
         } else if (theme == "DarkMode") {
             alwaysDark.disabled = false;
         }
+    }
+
+    static getPreferenceValue(key) {
+        // Get preference value by storage name
+        let userPrefs = UserPreferences.readFromLocalStorage();
+        if (userPrefs && userPrefs[key]) {
+            return userPrefs[key].value;
+        }
+
+        // Return default value if not found
+        if (key === "epubInternalStructure") {
+            return "OEBPS";
+        }
+        return null;
     }
 }
