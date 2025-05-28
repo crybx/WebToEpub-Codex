@@ -471,7 +471,8 @@ class ChapterUrlsUI {
         
         // Create three dots icon (inline SVG for color control)
         let moreIcon = SvgIcons.createSvgElement(SvgIcons.THREE_DOTS_VERTICAL);
-        
+        moreIcon.classList.add("menu-icon");
+
         // Create dropdown menu
         let menu = document.createElement("div");
         menu.className = "more-actions-menu";
@@ -587,8 +588,10 @@ class ChapterUrlsUI {
             [ChapterUrlsUI.CHAPTER_STATUS_SLEEPING]: SvgIcons.CHAPTER_STATE_SLEEPING,
             [ChapterUrlsUI.CHAPTER_STATUS_ERROR]: SvgIcons.EYE_FILL
         };
-
-        return SvgIcons.createSvgElement(svgConstants[state]);
+        
+        let iconElement = SvgIcons.createSvgElement(svgConstants[state]);
+        iconElement.classList.add("chapter-status-icon");
+        return iconElement;
     }
 
     static setChapterStatusVisuals(row, state, sourceUrl, title) {
