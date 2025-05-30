@@ -134,12 +134,17 @@ const main = (function() {
         window.workInProgress = disabled;
         main.getPackEpubButton().disabled = disabled;
         document.getElementById("downloadChaptersButton").disabled = disabled;
-        let addLib = document.getElementById("LibPauseToLibrary");
-        addLib.disabled = disabled;
-        addLib.hidden = !disabled;
-        let pause = document.getElementById("LibPauseToLibrary");
-        pause.disabled = !disabled;
-        pause.hidden = disabled;
+        document.getElementById("LibAddToLibrary").disabled = disabled;
+
+        // Enable/disable stop button based on processing state
+        let stopBtn = document.getElementById("stopDownloadButton");
+        if (stopBtn) {
+            stopBtn.disabled = !disabled;
+            // Reset button text when processing completes
+            if (!disabled) {
+                stopBtn.textContent = chrome.i18n.getMessage("__MSG_button_Stop_Download__") || "Stop";
+            }
+        }
 
         window.workInProgress = disabled;
     }
@@ -186,7 +191,8 @@ const main = (function() {
             parser.updateReadingList();
             if (util.sleepController.signal.aborted) {
                 util.sleepController = new AbortController;
-                resetUI();
+                // Don't reset UI completely - just update button states
+                setProcessingButtonsState(false);
             }
             if (libclick.dataset.libsuppressErrorLog == true) {
                 return;
@@ -198,6 +204,8 @@ const main = (function() {
             setProcessingButtonsState(false);
             if (util.sleepController.signal.aborted) {
                 util.sleepController = new AbortController;
+                // Operation was cancelled, don't show error
+                return;
             }
             ErrorLog.showErrorMessage(err);
         });
@@ -212,17 +220,32 @@ const main = (function() {
 
         await ChapterCache.downloadChaptersToCache().then(function() {
             setProcessingButtonsState(false);
+            if (util.sleepController.signal.aborted) {
+                util.sleepController = new AbortController;
+                return;
+            }
             parser.updateReadingList();
             ErrorLog.showLogToUser();
             dumpErrorLogToFile();
         }).catch(function(err) {
             setProcessingButtonsState(false);
+            if (util.sleepController.signal.aborted) {
+                util.sleepController = new AbortController;
+                return;
+            }
             ErrorLog.showErrorMessage(err);
         });
     }
 
-    function pauseToLibarary(){
-        util.sleepControler.abort();
+    function stopDownload(){
+        // Immediately update button to show stopping state
+        let stopBtn = document.getElementById("stopDownloadButton");
+        if (stopBtn) {
+            stopBtn.disabled = true;
+            stopBtn.textContent = "Stopping...";
+        }
+
+        util.sleepController.abort();
     }
 
     function epubVersionFromPreferences() {
@@ -684,7 +707,9 @@ const main = (function() {
         document.getElementById("LibShowAdvancedOptionsCheckbox").addEventListener("change", () => LibraryUI.LibRenderSavedEpubs());
         document.getElementById("LibShowCompactViewCheckbox").addEventListener("change", () => LibraryUI.LibRenderSavedEpubs());
         document.getElementById("LibAddToLibrary").addEventListener("click", fetchContentAndPackEpub);
-        document.getElementById("LibPauseToLibrary").addEventListener("click", pauseToLibrary);
+        if (document.getElementById("stopDownloadButton")) {
+            document.getElementById("stopDownloadButton").addEventListener("click", stopDownload);
+        }
         document.getElementById("stylesheetToDefaultButton").onclick = onStylesheetToDefaultClick;
         document.getElementById("resetButton").onclick = resetUI;
         document.getElementById("clearCoverImageUrlButton").onclick = clearCoverUrl;
