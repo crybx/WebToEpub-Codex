@@ -21,7 +21,6 @@ const main = (function() {
     let initialWebPage = null;
     let parser = null;
     let userPreferences = null;
-    let library = new Library;
 
     // register listener that is invoked when script injected into HTML sends its results
     function addMessageListener() {
@@ -165,7 +164,7 @@ const main = (function() {
             let backgroundDownload = userPreferences.noDownloadPopup.value;
             let fileName = Download.CustomFilename();
             if (libclick.dataset.libclick === "yes" || util.sleepController.signal.aborted) {
-                return library.LibAddToLibrary(content, fileName, document.getElementById("startingUrlInput").value, overwriteExisting, backgroundDownload);
+                return LibraryStorage.LibAddToLibrary(content, fileName, document.getElementById("startingUrlInput").value, overwriteExisting, backgroundDownload, userPreferences);
             }
             return Download.save(content, fileName, overwriteExisting, backgroundDownload);
         }).then(() => {
@@ -275,7 +274,6 @@ const main = (function() {
 
     function loadUserPreferences() {
         userPreferences = UserPreferences.readFromLocalStorage();
-        userPreferences.addObserver(library);
         userPreferences.writeToUi();
         userPreferences.hookupUi();
         BakaTsukiSeriesPageParser.registerBakaParsers(userPreferences.autoSelectBTSeriesPage.value);
@@ -346,7 +344,7 @@ const main = (function() {
         let section = getLibrarySection();
         section.hidden = !section.hidden;
         if (!section.hidden) {
-            Library.LibRenderSavedEpubs();
+            LibraryUI.LibRenderSavedEpubs();
         }
         section = getAdvancedOptionsSection();
         section.hidden = true;
@@ -673,7 +671,7 @@ const main = (function() {
         document.getElementById("hiddenBibButton").onclick = onLibraryClick;
         document.getElementById("cacheOptionsButton").onclick = onCacheOptionsClick;
         document.getElementById("ShowMoreMetadataOptionsCheckbox").addEventListener("change", () => onShowMoreMetadataOptionsClick());
-        document.getElementById("LibShowAdvancedOptionsCheckbox").addEventListener("change", () => Library.LibRenderSavedEpubs());
+        document.getElementById("LibShowAdvancedOptionsCheckbox").addEventListener("change", () => LibraryUI.LibRenderSavedEpubs());
         document.getElementById("LibAddToLibrary").addEventListener("click", fetchContentAndPackEpub);
         document.getElementById("LibPauseToLibrary").addEventListener("click", pauseToLibrary);
         document.getElementById("stylesheetToDefaultButton").onclick = onStylesheetToDefaultClick;
