@@ -673,6 +673,7 @@ const main = (function() {
         document.getElementById("cacheOptionsButton").onclick = onCacheOptionsClick;
         document.getElementById("ShowMoreMetadataOptionsCheckbox").addEventListener("change", () => onShowMoreMetadataOptionsClick());
         document.getElementById("LibShowAdvancedOptionsCheckbox").addEventListener("change", () => LibraryUI.LibRenderSavedEpubs());
+        document.getElementById("LibShowCompactViewCheckbox").addEventListener("change", () => LibraryUI.LibRenderSavedEpubs());
         document.getElementById("LibAddToLibrary").addEventListener("click", fetchContentAndPackEpub);
         document.getElementById("LibPauseToLibrary").addEventListener("click", pauseToLibrary);
         document.getElementById("stylesheetToDefaultButton").onclick = onStylesheetToDefaultClick;
