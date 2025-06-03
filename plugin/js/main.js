@@ -544,6 +544,8 @@ const main = (function() {
         ProgressBar.setValue(0);
         // Clear the selected value so it doesn't look like a parser is selected
         document.getElementById("manuallySelectParserTag").selectedIndex = -1;
+        // Update library button text in case library mode state has changed
+        updateLibraryButtonText();
     }
 
     function localize(element) {
@@ -886,6 +888,7 @@ const main = (function() {
             addEventHandlers();
             updateSidebarButtons();
             ChapterCache.updateCacheButtonText();
+            updateLibraryButtonText();
             populateControls();
             if (util.isFirefox()) {
                 Firefox.startWebRequestListeners();
@@ -894,6 +897,20 @@ const main = (function() {
             openTabWindow();
         }
     };
+
+    function updateLibraryButtonText() {
+        let button = document.getElementById("LibAddToLibrary");
+        if (!button) return;
+        
+        // Check if we're in library mode by looking for currentLibraryBook global
+        let isInLibraryMode = window.currentLibraryBook && window.currentLibraryBook.id;
+        
+        if (isInLibraryMode) {
+            button.textContent = chrome.i18n.getMessage("__MSG_button_Update_Library_Book__");
+        } else {
+            button.textContent = chrome.i18n.getMessage("__MSG_button_Add_to_Library__");
+        }
+    }
 
     return {
         getPackEpubButton: getPackEpubButton,
@@ -904,7 +921,8 @@ const main = (function() {
         setUiFieldToValue: setUiFieldToValue,
         getValueFromUiField: getValueFromUiField,
         getUserPreferences: () => userPreferences,
-        metaInfoFromControls: metaInfoFromControls
+        metaInfoFromControls: metaInfoFromControls,
+        updateLibraryButtonText: updateLibraryButtonText
     };
 })();
 
