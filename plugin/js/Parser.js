@@ -170,6 +170,11 @@ class Parser {
     }
 
     addTitleToContent(webPage, content) {
+        // Skip title extraction for cached content - title is already processed and embedded
+        if (webPage.isCachedContent) {
+            return;
+        }
+        
         let title = this.findChapterTitle(webPage.rawDom, webPage);
         if (title != null) {
             if (title instanceof HTMLElement) {
@@ -660,6 +665,7 @@ class Parser {
                     cachedDom.content.parentNode.replaceChild(cachedContent, cachedDom.content);
 
                     webPage.rawDom = cachedDom.dom;
+                    webPage.isCachedContent = true; // Mark as cached to skip title processing
                     delete webPage.error;
 
                     // The content is already processed, so we just need to handle images
