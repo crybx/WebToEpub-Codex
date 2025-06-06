@@ -118,7 +118,6 @@ class Parser {
         this.removeUnwantedElementsFromContentElement(content);
         this.addTitleToContent(webPage, content);
         util.fixBlockTagsNestedInInlineTags(content);
-        this.imageCollector.replaceImageTags(content);
         util.removeUnusedHeadingLevels(content);
         util.makeHyperlinksRelative(webPage.rawDom.baseURI, content);
         util.setStyleToDefault(content);
@@ -131,8 +130,8 @@ class Parser {
             let errorMsg = chrome.i18n.getMessage("warningNoVisibleContent", [webPage.sourceUrl]);
             ErrorLog.showErrorMessage(errorMsg);
         }
-        
-        // Cache the processed content (uses session, persistent or library book storage based on settings)
+
+        // Cache the processed content (uses session only, persistent or library book storage based on settings)
         if (webPage.sourceUrl) {
             // Fire and forget - don't wait for cache write
             ChapterCache.set(webPage.sourceUrl, content).then(async () => {
@@ -145,6 +144,28 @@ class Parser {
             );
         }
 
+        return content;
+    }
+
+    processImagesAndLinks(webPage, content) {
+        if (content == null) {
+            return null;
+        }
+
+        // Important: Fix any protocol-relative URLs (//domain.com) to absolute URLs
+        // so ImageCollector can process them properly
+        for (let img of content.querySelectorAll("img")) {
+            let srcAttr = img.getAttribute("src");
+            if (srcAttr && srcAttr.startsWith("//")) {
+                let newSrc = "https:" + srcAttr;
+                img.setAttribute("src", newSrc);
+            }
+        }
+        
+        this.imageCollector.findImagesUsedInDocument(content);
+        this.imageCollector.replaceImageTags(content);
+        util.makeHyperlinksRelative(webPage.rawDom ? webPage.rawDom.baseURI : webPage.sourceUrl, content);
+        
         return content;
     }
 
@@ -250,8 +271,11 @@ class Parser {
         let content;
         if (cachedContent) {
             content = cachedContent;
+            // Process cached content for image URLs and relative linking
+            content = this.processImagesAndLinks(webPage, content);
         } else {
             content = this.convertRawDomToContent(webPage);
+            content = this.processImagesAndLinks(webPage, content);
         }
         
         let items = [];
