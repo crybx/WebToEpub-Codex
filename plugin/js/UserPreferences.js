@@ -140,7 +140,7 @@ class UserPreferences { // eslint-disable-line no-unused-vars
         this.LibShowAdvancedOptions = this.addPreference("LibShowAdvancedOptions", "LibShowAdvancedOptionsCheckbox", false);
         this.LibShowCompactView = this.addPreference("LibShowCompactView", "LibShowCompactViewCheckbox", false);
         this.LibDownloadEpubAfterUpdate = this.addPreference("LibDownloadEpubAfterUpdate", "LibDownloadEpubAfterUpdateCheckbox", false);
-
+        this.defaultAuthorName = this.addPreference("defaultAuthorName", "defaultAuthorNameInput", "<unknown>");
         document.getElementById("themeColorTag").addEventListener("change", UserPreferences.SetTheme);
     }
 
