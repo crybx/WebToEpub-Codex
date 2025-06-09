@@ -23,7 +23,7 @@ class EpubItem {
 
     // name of the item in the zip.
     getZipHref() {
-        let paths = util.getEpubStructure();
+        let paths = EpubStructure.get();
         return util.makeStorageFileName(paths.textDirPattern, this.index, this.chapterTitle, "xhtml");
     }
 
@@ -184,7 +184,7 @@ class ImageInfo extends EpubItem { // eslint-disable-line no-unused-vars
     }
 
     getZipHref() {
-        let paths = util.getEpubStructure();
+        let paths = EpubStructure.get();
         let suffix = util.getDefaultExtensionByMime(this.mediaType) || this.findImageSuffix(this.wrappingUrl);
         return util.makeStorageFileName(paths.imagesDirPattern, this.index, this.getImageName(this.wrappingUrl), suffix);
     }
