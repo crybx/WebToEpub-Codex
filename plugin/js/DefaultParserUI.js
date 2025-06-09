@@ -151,7 +151,7 @@ class DefaultParserUI { // eslint-disable-line no-unused-vars
         let config = parser.siteConfigs.getConfigForSite(hostname);
         if (util.isNullOrEmpty(config.testUrl))
         {
-            alert(chrome.i18n.getMessage("warningNoChapterUrl"));
+            alert(UIText.Warning.warningNoChapterUrl);
             return;
         }
         return HttpClient.wrapFetch(config.testUrl).then((xhr) => {
@@ -159,7 +159,7 @@ class DefaultParserUI { // eslint-disable-line no-unused-vars
             util.setBaseTag(config.testUrl, webPage.rawDom);
             let content = parser.findContent(webPage.rawDom);
             if (content === null) {
-                let errorMsg = chrome.i18n.getMessage("errorContentNotFound", [config.testUrl]);
+                let errorMsg = UIText.Error.errorContentNotFound(config.testUrl);
                 throw new Error(errorMsg);
             }
             parser.removeUnwantedElementsFromContentElement(content);
