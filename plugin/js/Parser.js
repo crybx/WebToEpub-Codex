@@ -371,45 +371,28 @@ class Parser {
         return;
     }
 
+    safeExtract = (extractFn, defaultValue = "") => {
+        try {
+            return extractFn();
+        } catch(err) {
+            return defaultValue;
+        }
+    };
+
     getEpubMetaInfo(dom, useFullTitle) {
         let metaInfo = new EpubMetaInfo();
         metaInfo.uuid = dom.baseURI;
-        try {
-            metaInfo.title = this.extractTitle(dom);
-        }
-        catch (err) {
-            metaInfo.title = "";
-        }
-        try {
-            metaInfo.author = this.extractAuthor(dom).trim();
-        }
-        catch (err) {
-            metaInfo.author = "";
-        }
-        try {
-            metaInfo.language = this.extractLanguage(dom);
-        }
-        catch (err) {
-            metaInfo.language = "";
-        }
-        try {
-            metaInfo.fileName = this.makeSaveAsFileNameWithoutExtension(metaInfo.title, useFullTitle);
-        }
-        catch (err) {
-            metaInfo.fileName = "web.epub";
-        }
-        try {
-            metaInfo.subject = this.extractSubject(dom);
-        }
-        catch (err) {
-            metaInfo.subject = "";
-        }
-        try {
-            metaInfo.description = this.extractDescription(dom);
-        }
-        catch (err) {
-            metaInfo.description = "";
-        }
+
+        metaInfo.title = this.safeExtract(() => this.extractTitle(dom));
+        metaInfo.author = this.safeExtract(() => this.extractAuthor(dom).trim());
+        metaInfo.language = this.safeExtract(() => this.extractLanguage(dom));
+        metaInfo.fileName = this.safeExtract(
+            () => this.makeSaveAsFileNameWithoutExtension(metaInfo.title, useFullTitle),
+            "web.epub"
+        );
+        metaInfo.subject = this.safeExtract(() => this.extractSubject(dom));
+        metaInfo.description = this.safeExtract(() => this.extractDescription(dom));
+
         this.extractSeriesInfo(dom, metaInfo);
         return metaInfo;
     }
