@@ -204,8 +204,7 @@ class UserPreferences { // eslint-disable-line no-unused-vars
 
     async handleEpubStructureChange(event) {
         let newStructure = event.target.value;
-        let epubStructurePref = this.getPreference("epubInternalStructure");
-        let currentStructure = epubStructurePref.value;
+        let currentStructure = this.epubInternalStructure.value;
         
         if (newStructure === currentStructure) {
             return; // No change
@@ -217,7 +216,7 @@ class UserPreferences { // eslint-disable-line no-unused-vars
             
             if (bookCount === 0) {
                 // No library books, just update the preference
-                epubStructurePref.value = newStructure;
+                this.epubInternalStructure.value = newStructure;
                 this.writeToLocalStorage();
                 this.notifyObserversOfChange();
                 return;
@@ -250,7 +249,7 @@ class UserPreferences { // eslint-disable-line no-unused-vars
 
             if (result.success) {
                 // Update the preference
-                epubStructurePref.value = newStructure;
+                this.epubInternalStructure.value = newStructure;
                 this.writeToLocalStorage();
                 this.notifyObserversOfChange();
                 
@@ -394,28 +393,5 @@ class UserPreferences { // eslint-disable-line no-unused-vars
         } else if (theme === "SunsetMode") {
             sunset.disabled = false;
         }
-    }
-
-    /**
-     * Get preference object by storage name
-     * @param {string} storageName - The storage name of the preference
-     * @returns {UserPreference|null} The preference object or null if not found
-     */
-    getPreference(storageName) {
-        return this.preferences.find(p => p.storageName === storageName) || null;
-    }
-
-    static getPreferenceValue(key) {
-        // Get preference value by storage name
-        let userPrefs = UserPreferences.readFromLocalStorage();
-        if (userPrefs && userPrefs[key]) {
-            return userPrefs[key].value;
-        }
-
-        // Return default value if not found
-        if (key === "epubInternalStructure") {
-            return "OEBPS";
-        }
-        return null;
     }
 }
