@@ -1141,7 +1141,26 @@ const util = (function() {
         "WaZqlQ==": ["image/x-cmu-raster"]
     };
 
+    function decipher(element, cipher, alphab = "") {
+        // Get cipher by copying
+        // abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+        // into an element that has the scrambled text on the page.
+        if (alphab === "") {
+            alphab = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        }
+        let sArray = element.textContent.split("");
+        for (let i = 0; i < sArray.length; i++) {
+            let index = alphab.indexOf(sArray[i]);
+            if (index !== -1) {
+                sArray[i] = cipher[index];
+            }
+        }
+        element.textContent = sArray.join("");
+    }
+
     return {
+        decipher: decipher,
+
         XMLNS: XMLNS,
         INLINE_ELEMENTS: INLINE_ELEMENTS,
         BLOCK_ELEMENTS: BLOCK_ELEMENTS,

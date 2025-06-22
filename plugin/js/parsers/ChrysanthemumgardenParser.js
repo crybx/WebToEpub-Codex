@@ -33,6 +33,13 @@ class ChrysanthemumgardenParser extends WordpressBaseParser {
             }
         }
 
+        const cipher = "tonquerzlawicvfjpsyhgdmkbxJKABRUDQZCTHFVLIWNEYPSXGOM";
+        let nodes = content.querySelectorAll(".jum");
+        for (let node of nodes) {
+            util.decipher(node, cipher);
+            node.classList.remove("jum");
+        }
+
         // get all elements where style contains height of 1px and remove them
         let onePxElements = content.querySelectorAll("[style*='height:1px']");
         util.removeElements(onePxElements);
