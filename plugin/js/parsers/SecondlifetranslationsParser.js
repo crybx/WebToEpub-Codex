@@ -12,6 +12,18 @@ class SecondlifetranslationsParser extends Parser {
         return util.hyperlinksToChapterList(menu);
     }
 
+    customRawDomToContentStep(chapter, content) {
+        const cipher = "rhbndjzvqkiexcwsfpogytumalVUQXWSAZKBJNTLEDGIRHCPFOMY";
+        let nodes = content.querySelectorAll(".jmbl");
+        for (let node of nodes) {
+            util.decipher(node, cipher);
+            node.classList.remove("jmbl");
+        }
+
+        let junkSpans = content.querySelectorAll(".jmbl-ent, .jmbl-disclaimer")
+        util.removeElements(junkSpans);
+    }
+
     findContent(dom) {
         return dom.querySelector("div.entry-content");
     }
