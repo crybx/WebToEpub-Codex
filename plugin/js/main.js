@@ -706,17 +706,38 @@ const main = (function() {
         updateSidebarButtons();
     }
 
-    function showReadingList() {
+    /**
+     * Hide all sections and UI elements, show only the specified ones
+     * Returns a function to restore previous visibility state
+     */
+    function hideAllSectionsExcept(...sectionsToShow) {
         let sections = new Map(
             [...document.querySelectorAll("section")]
                 .map(s => [s, s.hidden])
         );
         [...sections.keys()].forEach(s => s.hidden = true);
 
-        document.getElementById("readingListSection").hidden = false;
-        document.getElementById("closeReadingList").onclick = () => {
+        // Also hide the sidebar toggle button (filter controls don't make sense in special modes)
+        let sidebarButton = document.getElementById("openSidebarButton");
+        let sidebarButtonWasHidden = sidebarButton ? sidebarButton.hidden : true;
+        if (sidebarButton) {
+            sidebarButton.hidden = true;
+        }
+
+        sectionsToShow.forEach(sectionId => {
+            document.getElementById(sectionId).hidden = false;
+        });
+
+        return function restoreSections() {
             [...sections].forEach(s => s[0].hidden = s[1]);
+            if (sidebarButton) {
+                sidebarButton.hidden = sidebarButtonWasHidden;
+            }
         };
+    }
+
+    function showReadingList() {
+        document.getElementById("closeReadingList").onclick = hideAllSectionsExcept("readingListSection");
 
         let table = document.getElementById("readingListTable");
         userPreferences.readingList.showReadingList(table);
@@ -966,7 +987,8 @@ const main = (function() {
         getValueFromUiField: getValueFromUiField,
         getUserPreferences: () => userPreferences,
         metaInfoFromControls: metaInfoFromControls,
-        updateLibraryButtonText: updateLibraryButtonText
+        updateLibraryButtonText: updateLibraryButtonText,
+        hideAllSectionsExcept: hideAllSectionsExcept
     };
 })();
 
