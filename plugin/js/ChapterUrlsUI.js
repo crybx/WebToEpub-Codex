@@ -130,7 +130,7 @@ class ChapterUrlsUI {
         rangeStart.innerHTML = "";
         rangeEnd.innerHTML = "";
 
-        chapterList.forEach(function(chapter, index) {
+        chapterList.forEach((chapter, index) => {
             // Add to range selectors
             ChapterUrlsUI.appendOptionToSelect(rangeStart, index, chapter, memberForTextOption);
             ChapterUrlsUI.appendOptionToSelect(rangeEnd, index, chapter, memberForTextOption);

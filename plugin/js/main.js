@@ -274,7 +274,7 @@ const main = (function() {
             }
         } else {
             // Normal Mode: download chapters to cache
-            await ChapterCache.downloadChaptersToCache().then(function() {
+            await ChapterCache.downloadChaptersToCache().then(() => {
                 setProcessingButtonsState(false);
                 if (util.sleepController.signal.aborted) {
                     util.sleepController = new AbortController;
@@ -283,7 +283,7 @@ const main = (function() {
                 parser.updateReadingList();
                 ErrorLog.showLogToUser();
                 dumpErrorLogToFile();
-            }).catch(function(err) {
+            }).catch((err) => {
                 setProcessingButtonsState(false);
                 if (util.sleepController.signal.aborted) {
                     util.sleepController = new AbortController;
