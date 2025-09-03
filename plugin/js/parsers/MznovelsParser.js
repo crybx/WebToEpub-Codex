@@ -18,13 +18,16 @@ class MznovelsParser extends Parser { // eslint-disable-line no-unused-vars
     }
 
     getUrlsOfTocPages(dom) {
-        let pagination = dom.querySelector(".pagination");
-        let url = new URL(pagination.querySelector("a").href);
         let urls = [];
-        let maxPage = this.maxTocPage(pagination);
-        for (let i = 2; i <= maxPage; i++) {
-            url.searchParams.set("page", i);
-            urls.push(url.href);
+        let pagination = dom.querySelector(".pagination");
+        if (pagination)
+        {
+            let url = new URL(pagination.querySelector("a").href);
+            let maxPage = this.maxTocPage(pagination);
+            for (let i = 2; i <= maxPage; i++) {
+                url.searchParams.set("page", i);
+                urls.push(url.href);
+            }
         }
         return urls;
     }
