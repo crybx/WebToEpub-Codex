@@ -7,6 +7,10 @@ class MznovelsParser extends Parser { // eslint-disable-line no-unused-vars
         super();
     }
 
+    populateUIImpl() {
+        document.getElementById("removeAuthorNotesRow").hidden = false;
+    }
+
     async getChapterUrls(dom, chapterUrlsUI) {
         let tocPage1chapters = this.extractPartialChapterList(dom);
         let urlsOfTocPages  = this.getUrlsOfTocPages(dom);
@@ -49,6 +53,20 @@ class MznovelsParser extends Parser { // eslint-disable-line no-unused-vars
 
     findContent(dom) {
         return dom.querySelector(".chapter-content");
+    }
+
+    preprocessRawDom(webPageDom) {
+        let content = this.findContent(webPageDom);
+        if (!this.userPreferences.removeAuthorNotes.value) {
+            let note = webPageDom.querySelector("div.author_note");
+            if (note) {
+                util.removeChildElementsMatchingSelector(note, ".author_note_avatar > img");
+                for (let pre of [...note.querySelectorAll(".note_content")]) {
+                    util.convertPreTagToPTags(webPageDom, pre, "\n");
+                }
+                content.appendChild(note);
+            }
+        }
     }
 
     extractTitleImpl(dom) {
