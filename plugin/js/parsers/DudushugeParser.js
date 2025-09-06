@@ -50,7 +50,6 @@ class DudushugeParser extends Parser {
     }
     
     findCoverImageUrl(dom) {
-        // Most common implementation is get first image in specified container. e.g. 
         return util.getFirstImgSrc(dom, ".imgbox");
     }
 }
