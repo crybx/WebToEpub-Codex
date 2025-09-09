@@ -90,7 +90,7 @@ class KemonopartyParser extends Parser {
             : await this.getLastPageOffsetAlternative(urlbuilder);
     }
 
-    async getLastPageOffsetAlternative(urlbuilder){
+    async getLastPageOffsetAlternative(urlbuilder) {
         let regex1 = new RegExp("/posts?.+");
         let profile = await this.fetchJson(urlbuilder.href.replace(regex1, "/profile"));
         return profile?.post_count;
