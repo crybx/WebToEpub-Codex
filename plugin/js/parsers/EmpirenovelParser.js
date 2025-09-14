@@ -53,15 +53,6 @@ class EmpirenovelParser extends Parser { // eslint-disable-line no-unused-vars
         return dom.querySelector("h1:not(.show_title)");
     }
 
-    // Optional, supply if individual chapter titles are not inside the content element
-    /*
-    findChapterTitle(dom) {
-        // typical implementation is find node with the Title
-        // Return Title element, OR the title as a string
-        return dom.querySelector("h3.dashhead-title");
-    }
-    */
-
     findCoverImageUrl(dom) {
         return util.getFirstImgSrc(dom, "div.cover");
     }
