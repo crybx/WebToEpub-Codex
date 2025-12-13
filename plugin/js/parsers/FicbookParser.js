@@ -33,9 +33,12 @@ class FicbookParser extends Parser {
     findContent(dom) {
         return dom.querySelector("#content");
     }
+    customRawDomToContentStep(chapter, content) {
+        content.innerHTML = content.innerText.split("\n\n").map(x=>"<p>" + x + "</p>").join("");
+    }
 
     extractTitleImpl(dom) {
-        return dom.querySelector("h1.heading[itemprop='name']");
+        return dom.querySelector("h1.heading");
     }
 
     extractAuthor(dom) {
@@ -54,6 +57,9 @@ class FicbookParser extends Parser {
 
     extractDescription(dom) {
         return dom.querySelector("meta[name='description']")?.textContent;
+    }
+    extractSeriesInfo(dom, metaInfo) {  // eslint-disable-line no-unused-vars
+        metaInfo.fileName = this.extractTitleImpl(dom).textContent;
     }
 
     findChapterTitle(dom) {
