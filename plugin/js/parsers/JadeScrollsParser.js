@@ -33,8 +33,7 @@ class JadeScrollsParser extends Parser {
 
         try {
             let apiUrl = "https://api.jadescrolls.com/api/public/get-novel-by-slug?slug=" + novelSlug + "&chapterSort=ASC";
-            let jsonResponse = await HttpClient.fetchJson(apiUrl);
-            let novelData = await jsonResponse.json;
+            let novelData = (await HttpClient.fetchJson(apiUrl)).json;
             this.novelData = novelData.data;
         } catch (error) {
             ErrorLog.log(error);
@@ -49,15 +48,16 @@ class JadeScrollsParser extends Parser {
         if (this.novelData?.chapter) {
             chapters = this.novelData.chapter.map(chapter => ({
                 sourceUrl: "https://jadescrolls.com/novel/" + novelSlug + "/" + chapter.slug,
-                title: chapter.title || ("Episode " + chapter.chapterNo)
+                title: JadeScrollsParser.makeTitle(chapter)
             }));
         }
-
-        chapters.sort((a, b) => {
-            return this.extractEpisodeNumber(a.sourceUrl) - this.extractEpisodeNumber(b.sourceUrl);
-        });
-
         return chapters;
+    }
+
+    static makeTitle(chapter) {
+        return chapter.title
+            ? chapter.chapterNo + ": " + chapter.title
+            : ("Episode " + chapter.chapterNo);
     }
 
     extractNovelSlug(url) {
@@ -71,7 +71,7 @@ class JadeScrollsParser extends Parser {
     }
 
     findContent(dom) {
-        return dom.querySelector(".content-inner");
+        return Parser.findConstrutedContent(dom);
     }
 
     extractTitleImpl() {
@@ -92,32 +92,26 @@ class JadeScrollsParser extends Parser {
         let chapterSlug = match[2];
         let apiUrl = "https://api.jadescrolls.com/api/user/get-chapter-by-slug?novelSlug=" + novelSlug + "&chapterSlug=" + chapterSlug;
 
-        let jsonResponse = await HttpClient.fetchJson(apiUrl);
-        let chapterData = await jsonResponse.json;
+        let chapterData = (await HttpClient.fetchJson(apiUrl)).json;
         return this.buildDomFromChapterData(chapterData, url);
     }
 
     buildDomFromChapterData(chapterData, sourceUrl) {
-        let dom = Parser.makeEmptyDocForContent(sourceUrl);
+        let newDoc = Parser.makeEmptyDocForContent(sourceUrl);
         let data = chapterData.data || chapterData;
 
         if (data.title) {
-            let titleElement = dom.createElement("h1");
-            titleElement.textContent = data.title;
-            dom.body.appendChild(titleElement);
+            let titleElement = newDoc.dom.createElement("h1");
+            titleElement.textContent = JadeScrollsParser.makeTitle(data);
+            newDoc.content.appendChild(titleElement);
         }
-
-        let contentDiv = dom.createElement("div");
-        contentDiv.className = "content-inner";
 
         let rawHtml = data.content || data.body || "";
         if (rawHtml) {
             let sanitized = util.sanitize(rawHtml);
-            contentDiv.appendChild(sanitized);
+            util.moveChildElements(sanitized.body, newDoc.content);
         }
-
-        dom.body.appendChild(contentDiv);
-        return dom;
+        return newDoc.dom;
     }
 
     findCoverImageUrl(dom) {
