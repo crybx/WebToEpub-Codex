@@ -32,7 +32,9 @@ const util = (function() {
         }
         else
         {
-            return (typeof (browser) !== "undefined");
+            // this only works as long as firefox hasn't implemented this 
+            // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/PlatformNaclArch
+            return (typeof (browser.runtime.PlatformNaclArch) == "undefined");
         }
     }
 
