@@ -39,7 +39,7 @@ class TwkanParser extends Parser {
     }
 
     findContent(dom) {
-        // css selector for novel body: #txtcontent0
+        // User provided: #txtcontent0
         return dom.querySelector("#txtcontent0");
     }
 
@@ -96,7 +96,7 @@ class TwkanParser extends Parser {
     }
 
     findChapterTitle(dom) {
-        // css selector found from github: #container > div.mybox > div.txtnav > h1
+        // User provided: #container > div.mybox > div.txtnav > h1
         // Also try simpler selectors
         return dom.querySelector(".txtnav h1, #container .txtnav h1, h1");
     }
@@ -143,7 +143,6 @@ class TwkanParser extends Parser {
         super.removeUnwantedElementsFromContentElement(element);
     }
 
-    getInformationEpubItemChildNodes(dom) {
-        return [...dom.querySelectorAll(".navtxt, .bookinfo, #tab_info .navtxt")];
-    }
+    // Note: getInformationEpubItemChildNodes intentionally not defined
+    // to skip info page (DOMPurify not available in this extension build)
 }
