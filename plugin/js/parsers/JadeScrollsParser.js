@@ -11,6 +11,10 @@ class JadeScrollsParser extends Parser {
         this.ChacheChapterContent = new Map();
     }
 
+    populateUIImpl() {
+        document.getElementById("removeChapterNumberRow").hidden = false;
+    }
+
     async getChapterUrls() {
         let chapters = [];
         let Chapterjsons = (await HttpClient.fetchJson("https://api.jadescrolls.com/api/novels-chapter/"+this.id+"/chapters/list?limit="+this.chapters_count+"&page=1&novelId="+this.id+"&status=PUBLISHED&isDeleted=false&sortOrder=desc")).json;
@@ -22,7 +26,7 @@ class JadeScrollsParser extends Parser {
     chaptersFromJson(json) {
         return json.data.map(a => ({
             sourceUrl: "https://jadescrolls.com/novel/"+this.slug+"/"+a.slug, 
-            title: a.title, 
+            title: document.getElementById("removeChapterNumberCheckbox").checked?a.title:"Chapter "+a.chapter_number+": "+a.title, 
             isIncludeable: (a.type == "FREE")
         })).reverse();
     }
