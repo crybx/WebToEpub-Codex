@@ -12,7 +12,7 @@ class LightNovelWorldOrgParser extends Parser {
     // eslint-disable-next-line no-unused-vars
     async getChapterUrls(dom, chapterUrlsUI) {
         const url = dom.baseURI;
-        const match = url.match(/\/novel\/([^\/]+)/);
+        const match = url.match(new RegExp("/novel/([^/]+)"));
         if (!match) {
             throw new Error("Could not extract novel name from URL");
         }
