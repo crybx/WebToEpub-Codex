@@ -40,7 +40,7 @@ class AthenaTlsParser extends Parser {
     findCoverImageUrl(dom) {
         let div = dom.querySelector("div.novel-cover-large");
         
-        let re = new RegExp("(url)|[\\(\"\")]+", "g");
+        let re = /(^url)|[("|")]/g;
         let imgUrl = div?.style.backgroundImage.replace(re, "") || null;
 
         return imgUrl;
