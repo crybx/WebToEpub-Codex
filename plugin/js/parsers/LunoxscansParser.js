@@ -25,8 +25,6 @@ class LunoxscansParser extends MadaraParser {
      * @param { Document } dom 
      */
     extractTitleImpl(dom) {
-        const found = dom.querySelector(".post-title");
-
-        return found;
+        return dom.querySelector(".post-title");
     }
 }

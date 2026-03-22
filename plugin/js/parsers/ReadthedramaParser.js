@@ -37,9 +37,7 @@ class ReadthedramaParser extends Parser { // eslint-disable-line no-unused-vars
      */
     extractDescription(dom) {
         /** @type { HTMLMetaElement } */
-        const link = dom.querySelector("meta[property='og:description']");
-
-        return link.content;
+        return dom.querySelector("meta[property='og:description']")?.content;
     }
 
     /**
@@ -67,8 +65,6 @@ class ReadthedramaParser extends Parser { // eslint-disable-line no-unused-vars
      */
     findCoverImageUrl(dom) {
         /** @type { HTMLMetaElement } */
-        const link =  dom.querySelector("meta[property='og:image']");
-
-        return link.content;
+        return dom.querySelector("meta[property='og:image']")?.content;
     }
 }
