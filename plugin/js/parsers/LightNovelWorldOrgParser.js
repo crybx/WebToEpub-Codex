@@ -11,11 +11,17 @@ class LightNovelWorldOrgParser extends Parser {
 
     // eslint-disable-next-line no-unused-vars
     async getChapterUrls(dom, chapterUrlsUI) {
-        return await this.getChapterUrlsFromApi();
+        const url = dom.baseURI;
+        const match = url.match(/\/novel\/([^\/]+)/);
+        if (!match) {
+            throw new Error("Could not extract novel name from URL");
+        }
+        const novelName = match[1];
+        return await this.getChapterUrlsFromApi(novelName);
     }
 
-    async getChapterUrlsFromApi() {
-        const baseUrl = "https://lightnovelworld.org/api/novel/shadow-slave/chapters/";
+    async getChapterUrlsFromApi(novelName) {
+        const baseUrl = `https://lightnovelworld.org/api/novel/${novelName}/chapters/`;
         const limit = 500; // max limit (more than 500 just defaults to 500)
         let offset = 0;
         let allChapters = [];
@@ -28,7 +34,7 @@ class LightNovelWorldOrgParser extends Parser {
 
             if (data.chapters) {
                 const chapters = data.chapters.map(chapter => ({
-                    sourceUrl: `https://lightnovelworld.org/novel/shadow-slave/chapter/${chapter.number}/`,
+                    sourceUrl: `https://lightnovelworld.org/novel/${novelName}/chapter/${chapter.number}/`,
                     title: chapter.title
                 }));
                 allChapters.push(...chapters);
