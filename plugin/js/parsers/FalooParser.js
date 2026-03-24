@@ -12,7 +12,7 @@ class FalooParser extends Parser {
     }
 
     async getChapterUrls(dom) {
-        let tocUrl = dom.querySelector(".T-L-T-C-Box2 a:nth-child(4)");
+        let tocUrl = [...dom.querySelectorAll(".T-L-T-C-Box2 a")].find(a => a.textContent.trim().endsWith("目录"));
 
         let tocDom = (await HttpClient.wrapFetch(tocUrl)).responseXML;
 
