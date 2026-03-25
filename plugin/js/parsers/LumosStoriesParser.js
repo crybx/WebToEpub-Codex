@@ -1,11 +1,11 @@
 
 "use strict";
 
-parserFactory.register("lumostories.com", () => new LumosStoriesParer());
-parserFactory.register("api.lumostories.com", () => new LumosStoriesParer());
+parserFactory.register("lumostories.com", () => new LumosStoriesParser());
+parserFactory.register("api.lumostories.com", () => new LumosStoriesParser());
 
 
-class LumosStoriesParer extends Parser { 
+class LumosStoriesParser extends Parser { 
     constructor() {
         super();
         this.minimumThrottle = 3000;
