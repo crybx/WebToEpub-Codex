@@ -8,11 +8,17 @@ class TiemTruyenChuParser extends Parser {
     }
 
     async getChapterUrls(dom) {
-        return Array.from(dom.querySelectorAll(".chapter-page a.chapter-item-link"))
-            .map(link => ({
+        return Array.from(dom.querySelectorAll(".chapter-page a.chapter-item-link")).map(link => {
+            const parent = link.parentElement || link;
+            const isLocked = parent.querySelector(".fa-lock, .fa-lock-keyhole, [class*='vip'], [class*='lock']") !== null || 
+                             parent.innerHTML.includes("fa-lock");
+
+            return {
                 title: link.textContent.trim(),
                 sourceUrl: link.href,
-            }));
+                isIncludeable: !isLocked
+            };
+        });
     }
 
     extractTitleImpl(dom) {
