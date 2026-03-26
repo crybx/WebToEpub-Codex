@@ -3,7 +3,8 @@
 
 parserFactory.register("lumostories.com", () => new LumosStoriesParser());
 parserFactory.register("api.lumostories.com", () => new LumosStoriesParser());
-
+parserFactory.register("yoru.world", () => new YoruworldParer());
+parserFactory.register("api.yoru.world", () => new YoruworldParer());
 
 class LumosStoriesParser extends Parser { 
     constructor() {
@@ -11,10 +12,6 @@ class LumosStoriesParser extends Parser {
         this.minimumThrottle = 3000;
     }
 
-    /**
-     * 
-     * @returns {"https://api.lumostories.com/api/v1"}
-     */
     getApiBaseUrl() {
         return "https://api.lumostories.com/api/v1";
     }
@@ -130,4 +127,14 @@ class LumosStoriesParser extends Parser {
         }
     }
 
+}
+
+class YoruworldParer extends LumosStoriesParser {
+    constructor() {
+        super();
+    }
+
+    getApiBaseUrl() {
+        return "https://api.yoru.world/api/v1";
+    }
 }
