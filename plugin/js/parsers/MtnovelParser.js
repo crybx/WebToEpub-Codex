@@ -1,7 +1,6 @@
 "use strict";
 
-// Dead site (2026-04-08)
-parserFactory.register("mtnovel.net", () => new MtnovelParser());
+parserFactory.registerDeadSite("mtnovel.net", () => new MtnovelParser());
 
 class MtnovelParser extends Parser {
     constructor() {

@@ -72,10 +72,8 @@ class NovelfranceParser extends Parser {
      * @param { Document } dom 
      */
     extractTitleImpl(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:title']");
-
-        return meta?.content?.replace(/\s*\|\s*NovelFrance\s*$/, "")?.trim();
+        return dom.querySelector("meta[property='og:title']")
+            ?.content?.replace(/\s*\|\s*NovelFrance\s*$/, "")?.trim();
     }
 
     /**
@@ -84,9 +82,8 @@ class NovelfranceParser extends Parser {
      */
     extractAuthor(dom) {
         /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[name='og:book:author']");
-
-        return meta?.content ?? super.extractAuthor();
+        return dom.querySelector("meta[name='og:book:author']")?.content
+            ?? super.extractAuthor();
     }
 
     /**
@@ -94,10 +91,7 @@ class NovelfranceParser extends Parser {
      * @param { Document } dom 
      */
     extractSubject(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[name='og:book:tag']");
-
-        return meta?.content;
+        return dom.querySelector("meta[name='og:book:tag']")?.content;
     }
 
     /**
@@ -105,10 +99,7 @@ class NovelfranceParser extends Parser {
      * @param { Document } dom 
      */
     extractDescription(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:description']");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:description']")?.content;
     }
 
     /**
@@ -116,9 +107,6 @@ class NovelfranceParser extends Parser {
      * @param { Document } dom 
      */
     findCoverImageUrl(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:image']");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:image']")?.content;
     }
 }

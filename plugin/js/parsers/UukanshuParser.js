@@ -23,7 +23,7 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     findContent(dom) {
-        return dom.querySelector("div.readcotent"); // [sic]
+        return dom.querySelector("div.readcotent");
     }
 
     /**
@@ -39,10 +39,7 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     extractTitleImpl(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:title");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:title").content;
     }
 
     /**
@@ -50,10 +47,8 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     extractDescription(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:description");
-
-        return meta?.content?.replace(/<span.*?>/, "");
+        return dom.querySelector("meta[property='og:description")?.content
+            ?.replace(/<span.*?>/, "");
     }
 
     /**
@@ -61,10 +56,7 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     extractSubject(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:novel:category");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:novel:category")?.content;
     }
 
     /**
@@ -72,10 +64,7 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     extractAuthor(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:novel:author");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:novel:author")?.content;
     }
 
     /**
@@ -90,9 +79,6 @@ class UukanshuParser extends Parser {
      * @param { Document } dom 
      */
     findCoverImageUrl(dom) {
-        /** @type { HTMLMetaElement | null } */
-        const meta = dom.querySelector("meta[property='og:image']");
-
-        return meta?.content;
+        return dom.querySelector("meta[property='og:image']")?.content;
     }
 }

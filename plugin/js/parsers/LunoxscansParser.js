@@ -33,6 +33,7 @@ class LunoxscansParser extends MadaraParser {
         [...suspects]
             .filter(suspect => suspect.textContent.includes("Lunox"))
             .forEach(suspect => suspect.remove());
+        super.removeUnwantedElementsFromContentElement(dom);
     }
 
     /**
