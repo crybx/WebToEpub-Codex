@@ -7,7 +7,7 @@
     "dompurify": "^3.2.6"
   },
   "devDependencies": {
-    "@xmldom/xmldom": "^0.7.5",
+    "@xmldom/xmldom": "^0.9.10",
     "copyfiles": "^2.4.1",
     "eslint": "^8.0.0",
     "http-server": "^13.0.2",
