@@ -7,7 +7,7 @@ class LovelyBlossomsParser extends MadaraParser {
         super();
     }
 
-    async getChapterUrls(dom, chapterUrlsUI) {
+    async getChapterUrls(dom) {
         return [...dom.querySelectorAll("li.wp-manga-chapter a")]
             .map(a => util.hyperLinkToChapter(a))
             .reverse();
