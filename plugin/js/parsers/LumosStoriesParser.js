@@ -1,20 +1,23 @@
 
 "use strict";
 
-parserFactory.register("lumostories.com", () => new LumosStoriesParer());
-parserFactory.register("api.lumostories.com", () => new LumosStoriesParer());
+parserFactory.register("lumostories.com", () => new LumosStoriesParser());
+parserFactory.register("api.lumostories.com", () => new LumosStoriesParser());
+parserFactory.register("yoru.world", () => new YoruworldParer());
+parserFactory.register("api.yoru.world", () => new YoruworldParer());
 
+/**
+ * @typedef {"free"|"premium"|"preview"} Strategy
+ * 
+ * @typedef {{strategy: Strategy, first_n_chapters: number | null, last_n_chapters: number | null}} Paywall
+ */
 
-class LumosStoriesParer extends Parser { 
+class LumosStoriesParser extends Parser { 
     constructor() {
         super();
         this.minimumThrottle = 3000;
     }
 
-    /**
-     * 
-     * @returns {"https://api.lumostories.com/api/v1"}
-     */
     getApiBaseUrl() {
         return "https://api.lumostories.com/api/v1";
     }
@@ -31,17 +34,52 @@ class LumosStoriesParer extends Parser {
     }
 
     /**
+     * @param {{pos: number, number: number, release_date: Date}} chapter
+     * @param {Paywall} paywall 
+     * @returns 
+     */
+    isPaywalled(chapter, paywall) {
+        if (paywall.first_n_chapters != null && chapter.number <= paywall.first_n_chapters) return false;
+        if (paywall.last_n_chapters != null && chapter.pos > paywall.last_n_chapters) return false;
+        
+        return true;
+    }
+
+    /**
+     * @param {{pos: number, number: number, release_date: Date}} chapter
+     * @param {Paywall} paywall
+     * @returns {boolean}
+     */
+    isChapterIncludable(chapter, paywall) {
+        if ((paywall.strategy === "premium" || paywall.strategy === "freemium") && this.isPaywalled(chapter, paywall)) {
+            return false;
+        }
+
+        return new Date() >= new Date(chapter.release_date);
+    }
+
+    /**
      * @param {HTMLDocument} dom 
      */
     async getChapterUrls(dom) {
         let id = this.getBookId(dom);
         let book = (await HttpClient.fetchJson(`${this.getApiBaseUrl()}/books/${id}`)).json;
 
-        return book.chapters.map((ch) => ({
-            sourceUrl: `${this.getApiBaseUrl()}/book_chapters/${ch.id}/content?title=${ch.title}`,
-            title: `Chapter ${ch.number} - ${ch.title}`,
-            isIncludeable: new Date() >= new Date(ch.release_date)
-        })).reverse();
+        /**
+         * @type Paywall
+         */
+        let paywall = book.paywall;
+
+        return book.chapters.map((ch) => {
+            return ({
+                sourceUrl: `${this.getApiBaseUrl()}/book_chapters/${ch.id}/content?title=${ch.title}`,
+                title: `Chapter ${ch.number} - ${ch.title}`,
+                isIncludeable: this.isChapterIncludable({
+                    pos: book.chapters.length - ch.number,
+                    ...ch
+                }, paywall)
+            });
+        }).reverse();
     }
 
     /**
@@ -130,4 +168,14 @@ class LumosStoriesParer extends Parser {
         }
     }
 
+}
+
+class YoruworldParer extends LumosStoriesParser {
+    constructor() {
+        super();
+    }
+
+    getApiBaseUrl() {
+        return "https://api.yoru.world/api/v1";
+    }
 }
