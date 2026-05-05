@@ -11,10 +11,10 @@ class NovelhiParser extends Parser {
         let tocUrl = dom.querySelector("div.bookChapter a.fr").href;
         let tocDom = (await HttpClient.wrapFetch(tocUrl)).responseXML;
         return [...tocDom.querySelectorAll("div.dirList a")]
-            .map(a => NovelhiParser.LinkToChapter(a, dom.baseURI));
+            .map(a => NovelhiParser.LinkToChapter(a));
     }
 
-    static LinkToChapter(link, baseURI) {
+    static LinkToChapter(link) {
         return {
             sourceUrl: link.href,
             title: link.querySelector("span").textContent
