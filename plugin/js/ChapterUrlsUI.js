@@ -1433,39 +1433,47 @@ class ChapterUrlsUI {
     }
 
     /**
+     * Build story data from current UI state and chapters
+     */
+    static buildStoryData(chapters) {
+        // Get title and starting URL from main UI
+        let title = document.getElementById("titleInput")?.value || "Untitled Story";
+        let mainStoryUrl = document.getElementById("startingUrlInput")?.value || "";
+
+        // Get tags from subject input field, split on commas and clean up
+        let tagsInput = document.getElementById("subjectInput")?.value || "";
+        let tags = tagsInput.split(",").map(tag => tag.trim().toLowerCase()).filter(tag => tag.length > 0);
+
+        // Get selected chapters to find the last one
+        let selectedChapters = ChapterUrlsUI.getSelectedChapters(chapters);
+        let lastChapter = null;
+        if (selectedChapters.length > 0) {
+            lastChapter = selectedChapters[selectedChapters.length - 1];
+        }
+
+        const now = new Date().toISOString();
+        return {
+            title: title,
+            mainStoryUrl: mainStoryUrl,
+            lastChapterUrl: lastChapter?.sourceUrl,
+            lastChapterTitle: lastChapter?.title,
+            tags: tags,
+            dateLastGrabbed: lastChapter ? now : null,
+            dateLastChecked: lastChapter ? now : null,
+            dateAdded: now
+        };
+    }
+
+    /**
      * Export story information as JSON file
      */
     static async exportStoryAsJson(chapters) {
         try {
-            // Get title and starting URL from main UI
-            let title = document.getElementById("titleInput")?.value || "Untitled Story";
-            let mainStoryUrl = document.getElementById("startingUrlInput")?.value || "";
+            const storyData = ChapterUrlsUI.buildStoryData(chapters);
 
-            // Get selected chapters to find the last one
-            let selectedChapters = ChapterUrlsUI.getSelectedChapters(chapters);
-
-            // Get last selected chapter (fallback to last chapter in list if no selection)
-            let lastChapter = null;
-            if (selectedChapters.length > 0) {
-                lastChapter = selectedChapters[selectedChapters.length - 1];
-            } else if (chapters && chapters.length > 0) {
-                lastChapter = chapters[chapters.length - 1];
-            }
-
-            // Build JSON structure
+            // Wrap in JSON export format
             let jsonData = {
-                "stories": [
-                    {
-                        "title": title,
-                        "mainStoryUrl": mainStoryUrl,
-                        "lastChapterUrl": lastChapter?.sourceUrl || "",
-                        "lastChapterTitle": lastChapter?.title || "",
-                        "secondaryUrlMatches": [],
-                        "tags": [],
-                        "dateLastGrabbed": null,
-                        "dateAdded": new Date().toISOString()
-                    }
-                ]
+                "stories": [storyData]
             };
 
             // Create and download JSON file
@@ -1474,7 +1482,7 @@ class ChapterUrlsUI {
             let url = URL.createObjectURL(blob);
 
             // Generate filename from title
-            let filename = title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+            let filename = storyData.title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
             if (filename.length === 0) filename = "story";
             filename += "_export.json";
 
