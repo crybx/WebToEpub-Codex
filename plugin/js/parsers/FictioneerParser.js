@@ -85,8 +85,11 @@ class FictioneerParser extends Parser {
         let summary = dom.querySelector(".story__summary");
         if (summary === null) return "";
         summary = summary.cloneNode(true);
-        util.removeElements(summary.querySelectorAll(".related-stories-block, .code-block, .jp-relatedposts"));
-        return summary.textContent.trim();
+        util.removeElements(summary.querySelectorAll("figure, .story__thumbnail, .story__thumbnail-ribbon, .related-stories-block, .code-block, .jp-relatedposts"));
+        return [...summary.querySelectorAll("p")]
+            .map(p => p.textContent.trim())
+            .filter(t => t)
+            .join("\n\n");
     }
 
     findChapterTitle(dom) {
@@ -141,7 +144,7 @@ class FictioneerParser extends Parser {
     }
 
     removeUnwantedElementsFromContentElement(element) {
-        util.removeElements(element.querySelectorAll("iframe, .eoc-chapter-groups, .chapter-nav, .related-stories-block"));
+        util.removeElements(element.querySelectorAll("iframe, .eoc-chapter-groups, .chapter-nav, .related-stories-block, .code-block, .jp-relatedposts, .paragraph-tools"));
         super.removeUnwantedElementsFromContentElement(element);
     }
 
@@ -169,14 +172,20 @@ class LilyOnTheValleyParser extends FictioneerParser {
             // if it's a p tag and does not have attribute data-paragraph-id, remove it
             if (element.tagName === "P" && !element.hasAttribute("data-paragraph-id")) {
                 element.remove();
+                return;
             }
-
-            // if it's a span, and it's content is only hexadecimal: `<span class="[^"]*">[a-f0-9]+</span>`
+            // if it's a span, and it's got only lower case, numbers, # ; or &:
+            // `<span class="[^"]*">[a-z0-9#;&]+</span>`
             if (element.tagName === "SPAN"
                 && element.classList?.length === 1
-                && /^[a-f0-9]+$/.test(element.textContent)) {
+                && /^[a-z0-9#;%]+$/.test(element.textContent)) {
                 element.remove();
             }
+        });
+
+        // get all spans with data-fcnc-rev="1" and reverse the text inside them
+        content.querySelectorAll("span[data-fcnc-rev='1']").forEach(span => {
+            span.textContent = span.textContent.split("").reverse().join("");
         });
 
         super.customRawDomToContentStep(chapter, content);
