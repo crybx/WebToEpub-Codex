@@ -122,6 +122,9 @@ test("buildEpub3ContentOpf", async function (assert) {
             "<meta refines=\"#packingTool\" property=\"role\">bkp</meta>" +
             "<meta name=\"calibre:series\" content=\"BakaSeries\"/>" +
             "<meta name=\"calibre:series_index\" content=\"666\"/>" +
+            "<meta property=\"belongs-to-collection\" id=\"series\">BakaSeries</meta>" +
+            "<meta refines=\"#series\" property=\"collection-type\">series</meta>" +
+            "<meta refines=\"#series\" property=\"group-position\">666</meta>" +
             "<dc:source id=\"id.xhtml0000\">http://dummy.com/Title0</dc:source>" +
             "<dc:source id=\"id.xhtml0001\">http://dummy.com/Title1</dc:source>" +
             "</metadata>"+
@@ -140,11 +143,11 @@ test("buildEpub3ContentOpf", async function (assert) {
     );
 });
 
-test("buildContentOpf uses publication date", function (assert) {
+test("buildContentOpf uses publication date", async function (assert) {
     let epubPacker = makePacker();
     epubPacker.metaInfo.datePublished = "2019-12-23T00:00:00.000Z";
     epubPacker.getDateForMetaData = function () { return "2026-07-31T12:34:56.789Z"; };
-    let contentOpf = epubPacker.buildContentOpf(makeEpubItemSupplier());
+    let contentOpf = epubPacker.buildContentOpf(await makeEpubItemSupplier());
 
     assert.ok(contentOpf.includes("<dc:date>2019-12-23T00:00:00.000Z</dc:date>"));
 });
