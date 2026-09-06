@@ -201,17 +201,18 @@ class Parser {
             if (title instanceof HTMLElement) {
                 title = title.textContent;
             }
+            title = Parser.normalizeTitle(title);
             if (webPage.title == "[placeholder]") {
-                webPage.title = title.trim();
+                webPage.title = title;
             }
             if (!this.titleAlreadyPresent(title, content)) {
                 let titleElement = webPage.rawDom.createElement("h1");
-                titleElement.appendChild(webPage.rawDom.createTextNode(title.trim()));
+                titleElement.appendChild(webPage.rawDom.createTextNode(title));
                 content.insertBefore(titleElement, content.firstChild);
             }
         } else {
             if (webPage.title == "[placeholder]") {
-                webPage.title = webPage.rawDom.title;
+                webPage.title = Parser.normalizeTitle(webPage.rawDom.title);
             }
         }
     }
@@ -219,7 +220,7 @@ class Parser {
     titleAlreadyPresent(title, content) {
         let existingTitle = content.querySelector("h1, h2, h3, h4, h5, h6");
         return (existingTitle != null)
-            && (title.trim() === existingTitle.textContent.trim());
+            && (Parser.normalizeTitle(title) === Parser.normalizeTitle(existingTitle.textContent));
     }
 
     /**
@@ -328,6 +329,14 @@ class Parser {
     }
 
     /**
+    * Collapse runs of whitespace (including newlines and non-breaking
+    * spaces) in a title down to single spaces, and trim.
+    */
+    static normalizeTitle(title) {
+        return title?.replace(/\s+/g, " ").trim();
+    }
+
+    /**
     * default implementation
     */
     static extractTitleDefault(dom) {
@@ -347,7 +356,7 @@ class Parser {
         if (title.textContent !== undefined) {
             title = title.textContent;
         }
-        return title.trim();
+        return Parser.normalizeTitle(title);
     }
 
     /**
@@ -563,7 +572,7 @@ class Parser {
                 chapters = this.addFirstPageUrlToWebPages(url, firstPageDom, chapters);
             }
             chapters = this.cleanWebPageUrls(chapters);
-            chapters?.forEach(chapter => chapter.title = chapter.title?.trim());
+            chapters?.forEach(chapter => chapter.title = Parser.normalizeTitle(chapter.title));
             await this.userPreferences.readingList.deselectOldChapters(url, chapters);
             chapterUrlsUI.populateChapterUrlsTable(chapters);
             if (0 < chapters.length) {
